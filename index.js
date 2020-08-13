@@ -1,12 +1,15 @@
+'use strict';
 const store = {
   items: [
-    { id: cuid(), name: 'apples', checked: false },
-    { id: cuid(), name: 'oranges', checked: false },
-    { id: cuid(), name: 'milk', checked: true },
-    { id: cuid(), name: 'bread', checked: false }
+    { id: cuid(), name: 'apples', checked: false, rename: false },
+    { id: cuid(), name: 'oranges', checked: false, rename: false },
+    { id: cuid(), name: 'milk', checked: true, rename: false },
+    { id: cuid(), name: 'bread', checked: false, rename: false }
   ],
-  hideCheckedItems: false
+  hideCheckedItems: false,
 };
+
+
 
 const generateItemElement = function (item) {
   let itemTitle = `<span class='shopping-item shopping-item__checked'>${item.name}</span>`;
@@ -18,7 +21,11 @@ const generateItemElement = function (item) {
 
   return `
     <li class='js-item-element' data-item-id='${item.id}'>
-      ${itemTitle}
+      <form id = oldName>
+       <label class = 'title' for= 'rename'>${itemTitle}</label>
+       <input id= 'rename' type= 'text' 
+       placeholder= 'Enter new item name'/>
+      </form>  
       <div class='shopping-item-controls'>
         <button class='shopping-item-toggle js-item-toggle'>
           <span class='button-label'>check</span>
@@ -26,9 +33,27 @@ const generateItemElement = function (item) {
         <button class='shopping-item-delete js-item-delete'>
           <span class='button-label'>delete</span>
         </button>
+        <button class = 'rename'>Rename</button>
       </div>
     </li>`;
 };
+
+
+
+
+
+// function renameItem(){
+//   $('main').on('click', 'button.rename' function (event){
+    
+
+
+//   });
+//   //render();
+// }
+
+
+
+
 
 const generateShoppingItemsString = function (shoppingList) {
   const items = shoppingList.map((item) => generateItemElement(item));
@@ -51,6 +76,7 @@ const render = function () {
     items = items.filter(item => !item.checked);
   }
 
+
   /**
    * At this point, all filtering work has been 
    * done (or not done, if that's the current settings), 
@@ -63,7 +89,7 @@ const render = function () {
 };
 
 const addItemToShoppingList = function (itemName) {
-  store.items.push({ id: cuid(), name: itemName, checked: false });
+  store.items.push({ id: cuid(), name: itemName, checked: false, rename: false });
 };
 
 const handleNewItemSubmit = function () {
@@ -95,6 +121,18 @@ const getItemIdFromElement = function (item) {
     .data('item-id');
 };
 
+function rename(){
+  let val = $('li.js-item-element').find('input#rename').val();
+  store.items.name.replace(val);
+}
+
+function handleRename(){
+  $('body').on('click', 'button.rename', function (event){
+    //rename();
+    console.log(this.closest('li').find(label.title));
+    render();
+  })
+}
 /**
  * Responsible for deleting a list item.
  * @param {string} id 
@@ -160,6 +198,7 @@ const handleShoppingList = function () {
   handleItemCheckClicked();
   handleDeleteItemClicked();
   handleToggleFilterClick();
+  handleRename();
 };
 
 // when the page loads, call `handleShoppingList`
