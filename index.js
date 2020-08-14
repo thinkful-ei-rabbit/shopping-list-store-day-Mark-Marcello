@@ -11,7 +11,7 @@ const store = {
 
 
 
-const generateItemElement = function (item) {
+const generateItemElement = function (item, inputId) {
   let itemTitle = `<span class='shopping-item shopping-item__checked'>${item.name}</span>`;
   if (!item.checked) {
     itemTitle = `
@@ -21,11 +21,10 @@ const generateItemElement = function (item) {
 
   return `
     <li class='js-item-element' data-item-id='${item.id}'>
-      <form id = oldName>
        <label class = 'title' for= 'rename'>${itemTitle}</label>
-       <input id= 'rename' type= 'text' 
+       <input id= 'rename${inputId}' type= 'text' 
        placeholder= 'Enter new item name'/>
-      </form>  
+       <button class = 'rename${inputId}'>Rename</button>
       <div class='shopping-item-controls'>
         <button class='shopping-item-toggle js-item-toggle'>
           <span class='button-label'>check</span>
@@ -33,7 +32,7 @@ const generateItemElement = function (item) {
         <button class='shopping-item-delete js-item-delete'>
           <span class='button-label'>delete</span>
         </button>
-        <button class = 'rename'>Rename</button>
+        
       </div>
     </li>`;
 };
@@ -44,7 +43,7 @@ const generateItemElement = function (item) {
 
 // function renameItem(){
 //   $('main').on('click', 'button.rename' function (event){
-    
+
 
 
 //   });
@@ -56,22 +55,30 @@ const generateItemElement = function (item) {
 
 
 const generateShoppingItemsString = function (shoppingList) {
-  const items = shoppingList.map((item) => generateItemElement(item));
+  //const items = shoppingList.map((index, item) => generateItemElement(item, index));
+  let items = [];
+  console.log(store.items.length)
+  console.log(store.items[0])
+  for (let i = 0; i < store.items.length; i++){
+    items.push(generateItemElement(store.items[i], i + 1));
+  }
+  
   return items.join('');
 };
 
 /**
  * Render the shopping list in the DOM
  */
-const render = function () {
+const render = function (items) {
   // Set up a copy of the store's items in a local 
   // variable 'items' that we will reassign to a new
   // version if any filtering of the list occurs.
-  let items = [...store.items];
+  //let items = [...store.items];
   // If the `hideCheckedItems` property is true, 
   // then we want to reassign filteredItems to a 
   // version where ONLY items with a "checked" 
   // property of false are included.
+  console.log(items)
   if (store.hideCheckedItems) {
     items = items.filter(item => !item.checked);
   }
@@ -98,7 +105,7 @@ const handleNewItemSubmit = function () {
     const newItemName = $('.js-shopping-list-entry').val();
     $('.js-shopping-list-entry').val('');
     addItemToShoppingList(newItemName);
-    render();
+    render(store.items);
   });
 };
 
@@ -111,7 +118,7 @@ const handleItemCheckClicked = function () {
   $('.js-shopping-list').on('click', '.js-item-toggle', event => {
     const id = getItemIdFromElement(event.currentTarget);
     toggleCheckedForListItem(id);
-    render();
+    render(store.items);
   });
 };
 
@@ -121,18 +128,33 @@ const getItemIdFromElement = function (item) {
     .data('item-id');
 };
 
-function rename(){
-  let val = $('li.js-item-element').find('input#rename').val();
-  store.items.name.replace(val);
+// function rename() {
+//   let val = $('li.js-item-element').find('input#rename').val();
+// }
+
+function handleRename() {
+  $('.rename1, .rename2').on('click', 'button.rename', function (event) {
+    let val = $("#rename2").val();
+    console.log(val);
+    const id = getItemIdFromElement(event.currentTarget)
+    console.log(id);
+    store.items.forEach( item => {
+      if (item.id === id){
+        item.name = val;
+      }
+    });
+    //const id = getItemIdFromElement(event.currentTarget);
+    //store.items.find(function (key) {
+    //  return key.id = val;
+   // });
+    //console.log(this.closest('li').find(label.title));
+    //console.log(store.items)
+    render(store.items);
+  });
 }
 
-function handleRename(){
-  $('body').on('click', 'button.rename', function (event){
-    //rename();
-    console.log(this.closest('li').find(label.title));
-    render();
-  })
-}
+
+
 /**
  * Responsible for deleting a list item.
  * @param {string} id 
@@ -161,7 +183,8 @@ const handleDeleteItemClicked = function () {
     // Delete the item.
     deleteListItem(id);
     // Render the updated shopping list.
-    render();
+    console.log(val)
+    render(store.items);
   });
 };
 
@@ -179,7 +202,7 @@ const toggleCheckedItemsFilter = function () {
 const handleToggleFilterClick = function () {
   $('.js-filter-checked').click(() => {
     toggleCheckedItemsFilter();
-    render();
+    render(store.items);
   });
 };
 
@@ -193,7 +216,7 @@ const handleToggleFilterClick = function () {
  * shopping list items.
  */
 const handleShoppingList = function () {
-  render();
+  render(store.items);
   handleNewItemSubmit();
   handleItemCheckClicked();
   handleDeleteItemClicked();
